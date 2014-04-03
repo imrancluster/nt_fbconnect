@@ -1,0 +1,6 @@
+name = Pydream FB Connect
+description = Pydream simple facebook connect module.
+package = Pydream
+configure = admin/settings/fbconnect
+core = 7.x
+version = "7.x.0.1"

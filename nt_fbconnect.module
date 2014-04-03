@@ -1,0 +1,91 @@
+<?php
+
+/**
+ * Implements hook_init().
+ */
+function nt_fbconnect_init() {
+
+  drupal_add_js(libraries_get_path('jLabel') . '/jquery.jlabel.js');
+
+  $module_path = drupal_get_path( 'module', 'nt_fbconnect' );
+  drupal_add_js( $module_path . '/js/nt_fbconnect.js', array('scope' => 'footer') );
+
+  module_load_include('inc', 'nt_fbconnect', 'includes/nt_fbconnect.helper');
+  module_load_include('inc', 'nt_fbconnect', 'includes/nt_fbconnect.forms');
+  module_load_include('inc', 'nt_fbconnect', 'includes/nt_fbconnect.views');
+
+}
+
+
+
+function nt_fbconnect_menu() {
+  $items = array();
+
+  $items['fblogin'] = array(
+    'title' => t('Facebook Connect'),
+    'description' => t('Facebook Login'),
+    'page callback' => 'homepage_facebook_login',
+    'access callback' => TRUE,
+  );
+
+  $items['admin/settings/fbconnect'] = array(
+    'title' => 'FB Setting',
+    'description' => 'This is facebook connect setting page',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('nt_fbconnect_admin'),
+    'access arguments' => array('administer fbconnect settings'),
+    'type' => MENU_NORMAL_ITEM,
+   );
+
+  return $items;
+}
+
+
+
+/**
+ * Hook hook_form_alter api
+ */
+function nt_fbconnect_form_alter(&$form, &$form_state, $form_id) {
+
+}
+
+/**
+ * Implements hook_views_query_alter()
+ */
+function nt_fbconnect_views_query_alter(&$view, &$query) {
+
+}
+
+/**
+ * Helper function to login a user after registration. 
+ * needs username and password as parameter. 
+ */
+function nt_fbconnect_user_login_credentials($username, $password) {
+  if (user_authenticate($username, $password)) {
+    $user_obj = user_load_by_name($username);
+    $form_state = array();
+    $form_state['uid'] = $user_obj->uid;
+    user_login_submit(array(), $form_state);
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+
+function nt_fbconnect_uninstall() {
+  
+  variable_del('nt_fbconnect_appid');
+  variable_del('nt_fbconnect_appsecret');
+
+  db_query("DELETE FROM {variable} WHERE name LIKE '%nt_fbconnect%' ");
+  
+  drupal_flush_all_caches();
+
+}
+
+
+
+
+
